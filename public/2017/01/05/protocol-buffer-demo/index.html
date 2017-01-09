@@ -1,0 +1,666 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Protocol Buffer," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Take Mind" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="Protocol Buffer &amp;#x662F;Google&amp;#x4E00;&amp;#x6B3E;&amp;#x5E8F;&amp;#x5217;&amp;#x5316;&amp;#x7684;&amp;#x65B9;&amp;#x6848;&amp;#x3002;&amp;#x5E8F;&amp;#x5217;&amp;#x5316;&amp;#x662F;&amp;#x7F51;&amp;#x7EDC;&amp;#x4F20;&amp;#x8F93;&amp;#x7684;&amp;#x57FA;&amp;#x7840;&amp;#xFF0C;&amp;#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Protocol Buffer Java 实例">
+<meta property="og:url" content="https://xytutu.github.io/2017/01/05/protocol-buffer-demo/index.html">
+<meta property="og:site_name" content="Take Mind">
+<meta property="og:description" content="Protocol Buffer &amp;#x662F;Google&amp;#x4E00;&amp;#x6B3E;&amp;#x5E8F;&amp;#x5217;&amp;#x5316;&amp;#x7684;&amp;#x65B9;&amp;#x6848;&amp;#x3002;&amp;#x5E8F;&amp;#x5217;&amp;#x5316;&amp;#x662F;&amp;#x7F51;&amp;#x7EDC;&amp;#x4F20;&amp;#x8F93;&amp;#x7684;&amp;#x57FA;&amp;#x7840;&amp;#xFF0C;&amp;#">
+<meta property="og:updated_time" content="2017-01-05T03:06:23.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Protocol Buffer Java 实例">
+<meta name="twitter:description" content="Protocol Buffer &amp;#x662F;Google&amp;#x4E00;&amp;#x6B3E;&amp;#x5E8F;&amp;#x5217;&amp;#x5316;&amp;#x7684;&amp;#x65B9;&amp;#x6848;&amp;#x3002;&amp;#x5E8F;&amp;#x5217;&amp;#x5316;&amp;#x662F;&amp;#x7F51;&amp;#x7EDC;&amp;#x4F20;&amp;#x8F93;&amp;#x7684;&amp;#x57FA;&amp;#x7840;&amp;#xFF0C;&amp;#">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xytutu.github.io/2017/01/05/protocol-buffer-demo/"/>
+
+
+
+
+
+  <title> Protocol Buffer Java 实例 | Take Mind </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Take Mind</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">生命不止，折腾不息</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xytutu.github.io/2017/01/05/protocol-buffer-demo/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Bian Shuai">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Take Mind">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Take Mind" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Protocol Buffer Java 实例
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-05T11:04:09+08:00">
+                2017-01-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Protocol Buffer &#x662F;Google&#x4E00;&#x6B3E;&#x5E8F;&#x5217;&#x5316;&#x7684;&#x65B9;&#x6848;&#x3002;&#x5E8F;&#x5217;&#x5316;&#x662F;&#x7F51;&#x7EDC;&#x4F20;&#x8F93;&#x7684;&#x57FA;&#x7840;&#xFF0C;&#x5728;&#x73B0;&#x9636;&#x6BB5;&#x5206;&#x5E03;&#x5F0F;&#x4F7F;&#x7528;&#x6108;&#x52A0;&#x5E7F;&#x6CDB;&#x7684;&#x80CC;&#x666F;&#x4E0B;&#xFF0C;&#x9AD8;&#x6548;&#x7684;&#x5E8F;&#x5217;&#x5316;&#x65B9;&#x6848;&#x662F;&#x5FC5;&#x987B;&#x7684;&#x3002;&#x6BD4;&#x5982;Rpc&#xFF0C;Netty&#x90FD;&#x6709;&#x57FA;&#x4E8E;protocol buffer&#x7684;&#x5B9E;&#x73B0;&#x3002;<br>&#x4ECA;&#x5929;&#x5199;&#x4E2A;&#x7B80;&#x5355;&#x7684;&#x5B9E;&#x4F8B;&#xFF0C;&#x770B;&#x4E00;&#x4E0B;&#x5F00;&#x53D1;&#x7684;&#x5168;&#x8FC7;&#x7A0B;&#x3002;</p>
+<h3 id="&#x7F16;&#x5199;proto&#x6587;&#x4EF6;"><a href="#&#x7F16;&#x5199;proto&#x6587;&#x4EF6;" class="headerlink" title="&#x7F16;&#x5199;proto&#x6587;&#x4EF6;"></a>&#x7F16;&#x5199;proto&#x6587;&#x4EF6;</h3><p>  proto&#x6587;&#x4EF6;&#x5C31;&#x662F;&#x5E8F;&#x5217;&#x5316;&#x7684;&#x6A21;&#x677F;&#x7ED3;&#x6784;&#xFF0C;&#x540E;&#x7EED;proto&#x7F16;&#x8BD1;&#x5668;&#x80FD;&#x591F;&#x6839;&#x636E;&#x7528;&#x6237;&#x7F16;&#x5199;&#x7684;&#x6A21;&#x677F;&#x6587;&#x4EF6;&#x751F;&#x6210;&#x76F8;&#x5E94;&#x7684;java&#x7C7B;&#x3002;<br>  proto&#x6587;&#x4EF6;&#x662F;&#x9759;&#x6001;&#x7684;&#xFF0C;&#x53EA;&#x9700;&#x8981;&#x63CF;&#x8FF0;&#x6587;&#x4EF6;&#x7ED3;&#x6784;&#x5C31;&#x53EF;&#x4EE5;&#x76F8;&#x5F53;&#x4E8E;&#x8D2B;&#x8840;&#x6A21;&#x5F0F;&#x7684;&#x4EE3;&#x7801;&#xFF1B;&#x540E;&#x7EED;&#x751F;&#x6210;&#x7684;java&#x6587;&#x4EF6;&#x4F1A;&#x81EA;&#x52A8;&#x751F;&#x6210;&#xFF0C;get/set/build/parse&#x7B49;Protocol Buffer&#x89E3;&#x6790;&#x7684;&#x65B9;&#x6CD5;&#xFF0C;&#x76F8;&#x5F53;&#x4E8E;&#x5145;&#x8840;&#x6A21;&#x5F0F;&#xFF0C;&#x901A;&#x8FC7;&#x8FD9;&#x79CD;&#x65B9;&#x5F0F;&#x7528;&#x6237;&#x5C31;&#x4E0D;&#x5FC5;&#x7406;&#x89E3;Protocol Buffer&#x7684;&#x89E3;&#x6790;&#x89C4;&#x8303;&#x53BB;&#x5B9E;&#x73B0;&#x76F8;&#x5E94;&#x7684;&#x65B9;&#x6CD5;&#xFF0C;&#x4E3B;&#x9700;&#x5173;&#x6CE8;&#x81EA;&#x5DF1;&#x8981;&#x5E8F;&#x5217;&#x5316;&#x7684;&#x7ED3;&#x6784;&#x3002;<br>  <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">package bs.maven.test.protobuf;</div><div class="line">option java_package = &quot;bs.maven.test.protobuf&quot;;</div><div class="line">option java_outer_classname = &quot;AddressBookProtos&quot;;</div><div class="line"></div><div class="line">message Person {</div><div class="line">  required string name = 1;</div><div class="line">  required int32 id = 2;</div><div class="line">  optional string email = 3;</div><div class="line"></div><div class="line">  enum PhoneType {</div><div class="line">    MOBILE = 0;</div><div class="line">    HOME = 1;</div><div class="line">    WORK = 2;</div><div class="line">  }</div><div class="line"></div><div class="line">  message PhoneNumber {</div><div class="line">    required string number = 1;</div><div class="line">    optional PhoneType type = 2 [default = HOME];</div><div class="line">  }</div><div class="line"></div><div class="line">  repeated PhoneNumber phone = 4;</div><div class="line">}</div><div class="line"></div><div class="line">message AddressBook {</div><div class="line">  repeated Person person = 1;</div><div class="line">}</div></pre></td></tr></table></figure></p>
+<h3 id="&#x7F16;&#x8BD1;proto&#x6587;&#x4EF6;"><a href="#&#x7F16;&#x8BD1;proto&#x6587;&#x4EF6;" class="headerlink" title="&#x7F16;&#x8BD1;proto&#x6587;&#x4EF6;"></a>&#x7F16;&#x8BD1;proto&#x6587;&#x4EF6;</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">protoc -I=$SRC_DIR --java_out=$DST_DIR $SRC_DIR/addressbook.proto</div></pre></td></tr></table></figure>
+<p><a href="http://my.oschina.net/KingPan/blog/283881?fromerr=8vajR5S9" target="_blank" rel="external">Mac&#x4E0A;protoc&#x7F16;&#x8BD1;&#x5668;&#x7684;&#x5B89;&#x88C5;&#x53C2;&#x770B;</a></p>
+<h3 id="&#x4F7F;&#x7528;proto&#x6587;&#x4EF6;"><a href="#&#x4F7F;&#x7528;proto&#x6587;&#x4EF6;" class="headerlink" title="&#x4F7F;&#x7528;proto&#x6587;&#x4EF6;"></a>&#x4F7F;&#x7528;proto&#x6587;&#x4EF6;</h3><p>  &#x5C06;&#x751F;&#x6210;&#x7684;AddressBookProtos&#x4EE3;&#x7801;&#x76F4;&#x63A5;&#x62F7;&#x8D1D;&#x5230;&#x76F8;&#x5E94;&#x7684;&#x76EE;&#x5F55;&#x5C31;&#x53EF;&#x4EE5;&#x76F4;&#x63A5;&#x5F00;&#x53D1;&#x3002;&#x4EE5;&#x6587;&#x4EF6;&#x7684;&#x65B9;&#x5F0F;&#x8868;&#x793A;&#x5E8F;&#x5217;&#x5316;&#x8FC7;&#x7A0B;&#xFF0C;&#x7F51;&#x7EDC;&#x4F20;&#x8F93;&#x540C;&#x7406;&#x3002;</p>
+<ul>
+<li><p>&#x5DE5;&#x7A0B;Maven &#x4F9D;&#x8D56;&#xFF1A;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&lt;dependency&gt;</div><div class="line">	&lt;groupId&gt;com.google.protobuf&lt;/groupId&gt;</div><div class="line">	&lt;artifactId&gt;protobuf-java&lt;/artifactId&gt;</div><div class="line">	&lt;version&gt;2.5.0&lt;/version&gt;</div><div class="line">&lt;/dependency&gt;</div></pre></td></tr></table></figure>
+</li>
+<li><p>&#x5B9E;&#x4F8B;&#x4EE3;&#x7801;</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div></pre></td><td class="code"><pre><div class="line">  public class AddressTest {</div><div class="line"></div><div class="line">	private static final String fileName = &quot;/Users/bianshuai/Documents/tmp/protobuf/address&quot;;</div><div class="line"></div><div class="line">	public static void main(String[] args) {</div><div class="line">		write();</div><div class="line">		read();</div><div class="line">	}</div><div class="line"></div><div class="line">	public static void write() {</div><div class="line"></div><div class="line">		AddressBookProtos.Person john = Person.newBuilder().setId(1234).setName(&quot;John Doe&quot;).setEmail(&quot;jdoe@example.com&quot;)</div><div class="line">				.addPhone(Person.PhoneNumber.newBuilder().setNumber(&quot;555-4321&quot;).setType(Person.PhoneType.HOME)).build();</div><div class="line"></div><div class="line">		AddressBookProtos.Person gavin = Person.newBuilder().setId(12345).setName(&quot;gavin Doe&quot;)</div><div class="line">				.setEmail(&quot;gavin@example.com&quot;)</div><div class="line">				.addPhone(Person.PhoneNumber.newBuilder().setNumber(&quot;555-4323&quot;).setType(Person.PhoneType.HOME)).build();</div><div class="line"></div><div class="line">		AddressBookProtos.AddressBook address = AddressBookProtos.AddressBook.newBuilder().addPerson(john)</div><div class="line">				.addPerson(gavin).build();</div><div class="line">		FileOutputStream output = null;</div><div class="line">		try {</div><div class="line">			output = new FileOutputStream(&quot;fileName&quot;);</div><div class="line">			address.writeTo(output);</div><div class="line">		} catch (IOException e) {</div><div class="line">			e.printStackTrace();</div><div class="line">		} finally {</div><div class="line">			if (null != output) {</div><div class="line">				try {</div><div class="line">					output.close();</div><div class="line">				} catch (IOException e) {</div><div class="line">				}</div><div class="line">			}</div><div class="line">		}</div><div class="line">	}</div><div class="line"></div><div class="line">	public static void read() {</div><div class="line">		AddressBook addressBook;</div><div class="line">		try {</div><div class="line">			addressBook = AddressBook.parseFrom(new FileInputStream(fileName));</div><div class="line">			Print(addressBook);</div><div class="line">		} catch (Exception e) {</div><div class="line">			e.printStackTrace();</div><div class="line">		}</div><div class="line"></div><div class="line">	}</div><div class="line"></div><div class="line">	static void Print(AddressBook addressBook) {</div><div class="line">		for (Person person : addressBook.getPersonList()) {</div><div class="line">			System.out.println(&quot;Person ID: &quot; + person.getId());</div><div class="line">			System.out.println(&quot;  Name: &quot; + person.getName());</div><div class="line">			if (person.hasEmail()) {</div><div class="line">				System.out.println(&quot;  E-mail address: &quot; + person.getEmail());</div><div class="line">			}</div><div class="line"></div><div class="line">			for (Person.PhoneNumber phoneNumber : person.getPhoneList()) {</div><div class="line">				switch (phoneNumber.getType()) {</div><div class="line">				case MOBILE:</div><div class="line">					System.out.print(&quot;  Mobile phone #: &quot;);</div><div class="line">					break;</div><div class="line">				case HOME:</div><div class="line">					System.out.print(&quot;  Home phone #: &quot;);</div><div class="line">					break;</div><div class="line">				case WORK:</div><div class="line">					System.out.print(&quot;  Work phone #: &quot;);</div><div class="line">					break;</div><div class="line">				}</div><div class="line">				System.out.println(phoneNumber.getNumber());</div><div class="line">			}</div><div class="line">		}</div><div class="line">	}</div><div class="line">}</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="proto&#x6587;&#x4EF6;&#x7B80;&#x5355;&#x8BED;&#x6CD5;&#x5206;&#x6790;"><a href="#proto&#x6587;&#x4EF6;&#x7B80;&#x5355;&#x8BED;&#x6CD5;&#x5206;&#x6790;" class="headerlink" title="proto&#x6587;&#x4EF6;&#x7B80;&#x5355;&#x8BED;&#x6CD5;&#x5206;&#x6790;"></a>proto&#x6587;&#x4EF6;&#x7B80;&#x5355;&#x8BED;&#x6CD5;&#x5206;&#x6790;</h3><p>&#x53C2;&#x8003;Google&#x5F00;&#x53D1;&#x6587;&#x6863;(<a href="https://developers.google.com/protocol-buffers/docs/proto" target="_blank" rel="external">https://developers.google.com/protocol-buffers/docs/proto</a>)</p>
+<blockquote>
+<p>.proto&#x6587;&#x4EF6;&#x8D77;&#x59CB;&#x4E8E;&#x4E00;&#x4E2A;&#x5305;&#x58F0;&#x660E;&#xFF0C;&#x8FD9;&#x80FD;&#x591F;&#x5E2E;&#x52A9;&#x5728;&#x4E0D;&#x540C;&#x7684;&#x5DE5;&#x7A0B;&#x4E2D;&#x907F;&#x514D;&#x547D;&#x540D;&#x51B2;&#x7A81;&#x3002;&#x5728;&#x4F7F;&#x7528;Java&#x7684;&#x60C5;&#x51B5;&#x4E0B;&#xFF0C;package name&#x88AB;&#x7528;&#x6765;&#x4F5C;&#x4E3A;Java&#x7684;package&#xFF0C;&#x9664;&#x975E;&#x4F60;&#x8BE6;&#x7EC6;&#x6307;&#x5B9A;&#x4E86;&#x4E00;&#x4E2A;java_package&#xFF0C;&#x6B63;&#x5982;&#x6211;&#x4EEC;&#x5728;&#x8FD9;&#x91CC;&#x662F;&#x8FD9;&#x6837;&#x505A;&#x7684;&#x3002;&#x5373;&#x4F7F;&#x4F60;&#x5374;&#x662F;&#x63D0;&#x4F9B;&#x4E86;&#x4E00;&#x4E2A;java_package&#xFF0C;&#x4F60;&#x4E5F;&#x5E94;&#x8BE5;&#x4ECD;&#x65E7;&#x5B9A;&#x4E49;&#x4E00;&#x4E2A;&#x6B63;&#x5E38;&#x7684;package&#x4EE5;&#x4FBF;&#x5728;Protocol Buffers&#x547D;&#x540D;&#x7A7A;&#x95F4;&#x548C;&#x975E;Java&#x8BED;&#x8A00;&#x4E2D;&#x907F;&#x514D;&#x547D;&#x540D;&#x51B2;&#x7A81;&#x3002;</p>
+<p>&#x5728;&#x5305;&#x58F0;&#x660E;&#x4EE5;&#x540E;&#xFF0C;&#x4F60;&#x4F1A;&#x770B;&#x5230;&#x4E24;&#x4E2A;Java&#x7279;&#x6709;&#x7684;&#x914D;&#x7F6E;&#x9879;&#xFF1A;java_package&#x548C;java_outer_classname&#x3002;java_package&#x6307;&#x5B9A;&#x4F60;&#x751F;&#x6210;&#x7684;&#x7C7B;&#x8981;&#x5B58;&#x5728;&#x4E8E;&#x4EC0;&#x4E48;&#x5305;&#x4E0B;&#x3002;&#x5982;&#x679C;&#x4F60;&#x6CA1;&#x6709;&#x5177;&#x4F53;&#x7684;&#x6307;&#x5B9A;&#xFF0C;&#x5B83;&#x4F1A;&#x7B80;&#x5355;&#x7684;&#x4E0E;package&#x7ED9;&#x51FA;&#x7684;package name&#x76F8;&#x5339;&#x914D;&#xFF0C;&#x4F46;&#x662F;&#x8FD9;&#x4E9B;&#x540D;&#x5B57;&#x901A;&#x5E38;&#x4E0D;&#x9002;&#x5408;&#x505A;&#x4E3A;Java&#x5305;&#x7684;&#x540D;&#x5B57;&#xFF08;&#x56E0;&#x4E3A;&#x5B83;&#x4EEC;&#x901A;&#x5E38;&#x4E0D;&#x4EE5;&#x57DF;&#x540D;&#x5F00;&#x5934;&#xFF09;&#x3002;java_outer_classname&#x914D;&#x7F6E;&#x9879;&#x5B9A;&#x4E49;&#x4E86;&#x90A3;&#x4E9B;&#x5728;&#x8FD9;&#x4E2A;&#x6587;&#x4EF6;&#x4E2D;&#x5305;&#x542B;&#x6240;&#x6709;&#x7C7B;&#x7684;&#x540D;&#x79F0;&#x3002;&#x5982;&#x679C;&#x4F60;&#x6CA1;&#x6709;&#x5177;&#x4F53;&#x6307;&#x5B9A;java_outer_classname&#xFF0C;&#x5B83;&#x5C06;&#x4F1A;&#x8F6C;&#x6362;&#x6587;&#x4EF6;&#x540D;&#x4E3A;&#x9A7C;&#x5CF0;&#x5F0F;&#x6765;&#x4EA7;&#x751F;&#x3002;&#x4F8B;&#x5982;&#xFF0C;&#x201C;my_proto.proto&#x201D;&#x5C06;&#x9ED8;&#x8BA4;&#x4F7F;&#x7528;&#x201C;MyProto&#x201D;&#x505A;&#x4E3A;outer class name(&#x7C7B;&#x7684;&#x6587;&#x4EF6;&#x540D;)&#x3002;</p>
+<p>&#x63A5;&#x4E0B;&#x6765;&#x662F;&#x4F60;&#x7684;message&#x5B9A;&#x4E49;&#x3002;&#x4E00;&#x4E2A;message&#x53EA;&#x662F;&#x4E00;&#x7CFB;&#x5217;&#x5177;&#x6709;&#x7C7B;&#x578B;&#x7684;&#x57DF;&#x7684;&#x96C6;&#x5408;&#x3002;&#x8BB8;&#x591A;&#x6807;&#x51C6;&#x7684;&#x7B80;&#x5355;&#x7C7B;&#x578B;&#x53EF;&#x4EE5;&#x505A;&#x4E3A;&#x53EF;&#x7528;&#x7684;&#x57DF;&#x7C7B;&#x578B;&#xFF0C;&#x5305;&#x62EC;bool, int32, float, double, &#x548C;string&#x3002;&#x4F60;&#x540C;&#x6837;&#x53EF;&#x4EE5;&#x5411;&#x4F60;&#x7684;message&#x4E2D;&#x6DFB;&#x52A0;&#x66F4;&#x591A;&#x7684;&#x7ED3;&#x6784;&#xFF0C;&#x901A;&#x8FC7;&#x628A;&#x5176;&#x4ED6;&#x7684;message&#x7C7B;&#x578B;&#x5F53;&#x505A;&#x57DF;&#x7C7B;&#x578B;&#x4F7F;&#x7528;&#xFF0D;&#xFF0D;&#x5728;&#x4E0A;&#x9762;&#x7684;&#x4F8B;&#x5B50;&#x4E2D;&#xFF0C;Person message&#x5305;&#x542B;PhoneNumber message&#xFF0C;&#x800C;AddressBook message&#x5305;&#x542B;Person message&#x3002;&#x4F60;&#x751A;&#x81F3;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x5185;&#x90E8;&#x5D4C;&#x5957;&#x5176;&#x5B83;message&#x7684;&#x65B9;&#x5F0F;&#x5B9A;&#x4E49;message&#xFF0C;&#x4F60;&#x53EF;&#x4EE5;&#x770B;&#x5230;&#xFF0C;PhoneNumber&#x7C7B;&#x578B;&#x88AB;&#x5B9A;&#x4E49;&#x5728;Person&#x91CC;&#x9762;&#x3002;&#x4F60;&#x540C;&#x6837;&#x53EF;&#x4EE5;&#x5B9A;&#x4E49;enum&#x7C7B;&#x578B;&#xFF0C;&#x5982;&#x679C;&#x4F60;&#x5E0C;&#x671B;&#x5176;&#x4E2D;&#x7684;&#x4E00;&#x4E2A;&#x4F60;&#x7684;&#x57DF;&#x62E5;&#x6709;&#x9884;&#x5B9A;&#x4E49;&#x5217;&#x8868;&#x4E2D;&#x7684;&#x4E00;&#x4E2A;&#x503C;&#xFF0D;&#xFF0D;&#x5728;&#x8FD9;&#x91CC;&#xFF0C;&#x4F60;&#x5E0C;&#x671B;&#x6307;&#x5B9A;&#x4E00;&#x4E2A;phone number&#x7684;&#x503C;&#x662F;MOBILE, HOME, &#x6216;&#x8005;WORK&#x4E2D;&#x7684;&#x4E00;&#x4E2A;&#x3002;</p>
+<p>&#x8FD9;&#x91CC;&#x5728;&#x6BCF;&#x4E2A;&#x5143;&#x7D20;&#x4E0A;&#x9762;&#x7684;&#x201C;=1&#x201D;&#xFF0C;&#x201C;=2&#x201D;&#x6807;&#x8BB0;&#xFF0C;&#x8FA8;&#x8BC6;&#x552F;&#x4E00;&#x7684;&#x201C;tag&#x201D;&#xFF0C;&#x8FD9;&#x4E9B;&#x201C;tag&#x201D;&#x662F;&#x57DF;&#x5728;&#x4E8C;&#x8FDB;&#x5236;&#x7F16;&#x7801;&#x7684;&#x65F6;&#x5019;&#x4F7F;&#x7528;&#x7684;&#x3002;Tag&#x7F16;&#x53F7;&#x4ECE;1&#x5230;15&#xFF0C;&#x9700;&#x8981;&#x6BD4;&#x66F4;&#x5927;&#x7684;&#x6570;&#x5B57;&#x5C11;&#x4E00;&#x4E2A;&#x5B57;&#x8282;&#xFF0C;&#x56E0;&#x6B64;&#xFF0C;&#x51FA;&#x4E8E;&#x4F18;&#x5316;&#x8003;&#x8651;&#x4F60;&#x53EF;&#x4EE5;&#x51B3;&#x5B9A;&#x4F7F;&#x7528;&#x5E38;&#x7528;&#x7684;&#x6216;&#x8005;&#x91CD;&#x590D;&#x7684;&#x5143;&#x7D20;&#x3002;&#x800C;&#x4ECE;16&#x5230;&#x66F4;&#x9AD8;&#x7684;&#x7F16;&#x53F7;&#x7559;&#x7ED9;&#x4E0D;&#x5E38;&#x7528;&#x7684;&#x53EF;&#x9009;&#x5143;&#x7D20;&#x3002;&#x5728;&#x91CD;&#x590D;&#x57DF;&#x4E2D;&#x7684;&#x6BCF;&#x4E00;&#x4E2A;&#x5143;&#x7D20;&#x90FD;&#x9700;&#x8981;&#x91CD;&#x65B0;&#x7F16;&#x7801;tag number&#xFF0C;&#x6240;&#x4EE5;&#xFF0C;&#x4F7F;&#x7528;&#x91CD;&#x590D;&#x57DF;&#x5BF9;&#x4F18;&#x5316;&#x6765;&#x8BF4;&#x662F;&#x7279;&#x522B;&#x597D;&#x7684;&#x9009;&#x62E9;&#x3002;</p>
+<p>&#x6BCF;&#x4E00;&#x4E2A;&#x57DF;&#x90FD;&#x5FC5;&#x987B;&#x88AB;&#x4E0B;&#x9762;&#x4E4B;&#x4E00;&#x7684;modifer&#x6CE8;&#x89E3;&#xFF1A;</p>
+<ul>
+<li>required&#xFF1A;&#x57DF;&#x7684;&#x503C;&#x5FC5;&#x987B;&#x88AB;&#x63D0;&#x4F9B;&#xFF0C;&#x5426;&#x5219;message&#x4F1A;&#x88AB;&#x8BA4;&#x4E3A;&#x662F;&#x201C;&#x672A;&#x521D;&#x59CB;&#x5316;&#x7684;&#x201D;&#x3002;&#x8BD5;&#x56FE;&#x521B;&#x5EFA;&#x4E00;&#x4E2A;&#x672A;&#x521D;&#x59CB;&#x5316;&#x7684;message&#x5C06;&#x4F1A;&#x629B;&#x51FA;&#x4E00;&#x4E2A;RuntimeException&#x3002;&#x8F6C;&#x5316;&#x4E00;&#x4E2A;&#x672A;&#x521D;&#x59CB;&#x5316;&#x7684;message&#x5C06;&#x4F1A;&#x629B;&#x51FA;&#x4E00;&#x4E2A;IOException&#x3002;&#x9664;&#x4E86;&#x8FD9;&#x4E9B;&#xFF0C;required&#x57DF;&#x7684;&#x884C;&#x4E3A;&#x548C;optional&#x57DF;&#x8868;&#x73B0;&#x76F8;&#x540C;&#x3002;</li>
+<li>optional&#xFF1A;&#x8BE5;&#x57DF;&#x53EF;&#x80FD;&#x88AB;&#x8BBE;&#x7F6E;&#xFF0C;&#x4E5F;&#x53EF;&#x80FD;&#x672A;&#x88AB;&#x8BBE;&#x7F6E;&#x3002;&#x5982;&#x679C;&#x4E00;&#x4E2A;optional&#x57DF;&#x672A;&#x88AB;&#x8BBE;&#x7F6E;&#xFF0C;&#x9ED8;&#x8BA4;&#x7684;&#x503C;&#x5C06;&#x4F1A;&#x88AB;&#x4F7F;&#x7528;&#x3002;&#x5BF9;&#x4E8E;&#x7B80;&#x5355;&#x7C7B;&#x578B;&#x6765;&#x8BF4;&#xFF0C;&#x4F60;&#x53EF;&#x4EE5;&#x6307;&#x5B9A;&#x4F60;&#x81EA;&#x5DF1;&#x7684;&#x9ED8;&#x8BA4;&#x503C;&#xFF0C;&#x5C31;&#x50CF;&#x6211;&#x4EEC;&#x5728;&#x4F8B;&#x5B50;&#x4E2D;&#x5BF9;phone number&#x7C7B;&#x578B;&#x6240;&#x505A;&#x7684;&#x90A3;&#x6837;&#x3002;&#x5426;&#x5219;&#xFF0C;&#x4E00;&#x4E2A;&#x7CFB;&#x7EDF;&#x9ED8;&#x8BA4;&#x7684;&#x503C;&#x5C06;&#x88AB;&#x4F7F;&#x7528;&#xFF1A;&#x6570;&#x503C;&#x7C7B;&#x578B;&#x662F;0&#xFF0C;&#x5B57;&#x7B26;&#x4E32;&#x7C7B;&#x578B;&#x662F;&#x201D;&#x201D;&#xFF0C;&#x5E03;&#x5C14;&#x7C7B;&#x578B;&#x662F;false&#x3002;&#x5BF9;&#x4E8E;&#x5D4C;&#x5165;&#x5F0F;&#x7684;message&#x6765;&#x8BF4;&#xFF0C;&#x9ED8;&#x8BA4;&#x503C;&#x603B;&#x662F;&#x8FD9;&#x4E2A;message&#x7684;&#x6CA1;&#x6709;&#x4EFB;&#x4F55;&#x57DF;&#x88AB;&#x8BBE;&#x7F6E;&#x8FC7;&#x7684;&#x201C;&#x9ED8;&#x8BA4;&#x5B9E;&#x4F8B;&#x201D;&#x6216;&#x201C;&#x539F;&#x578B;&#x201D;&#x3002;&#x8C03;&#x7528;&#x8BBF;&#x95EE;&#x5668;&#x53BB;&#x83B7;&#x53D6;&#x4E00;&#x4E2A;optional&#x6216;&#x8005;required&#x57DF;&#x7684;&#x503C;&#xFF0C;&#x8FD9;&#x4E9B;&#x57DF;&#x5982;&#x679C;&#x6CA1;&#x6709;&#x88AB;&#x5177;&#x4F53;&#x8BBE;&#x7F6E;&#xFF0C;&#x90A3;&#x4E48;&#x603B;&#x662F;&#x8FD4;&#x56DE;&#x57DF;&#x7684;&#x9ED8;&#x8BA4;&#x503C;&#x3002;</li>
+<li>repeated&#xFF1A;&#x57DF;&#x5C06;&#x4F1A;&#x88AB;&#x91CD;&#x590D;&#x4EFB;&#x610F;&#x6B21;&#x6570;&#xFF08;&#x5305;&#x62EC;0&#x6B21;&#xFF09;&#x3002;&#x91CD;&#x590D;&#x7684;&#x503C;&#x7684;&#x987A;&#x5E8F;&#x5C06;&#x4F1A;&#x88AB;&#x4FDD;&#x5B58;&#x5728;protocol buffer&#x4E2D;&#x3002;&#x53EF;&#x4EE5;&#x628A;&#x91CD;&#x590D;&#x7684;&#x57DF;&#x60F3;&#x6210;&#x53D8;&#x957F;&#x7684;&#x6570;&#x7EC4;&#x3002; </li>
+</ul>
+</blockquote>
+<h3 id="&#x603B;&#x7ED3;"><a href="#&#x603B;&#x7ED3;" class="headerlink" title="&#x603B;&#x7ED3;"></a>&#x603B;&#x7ED3;</h3><p>&#x6700;&#x8FD1;&#x67E5;&#x770B;&#x4E00;&#x4E2A;&#x5F00;&#x6E90;p2p&#x9879;&#x76EE;&#x7684;&#x4EE3;&#x7801;&#xFF0C;&#x5176;&#x4E2D;&#x6307;&#x4EE4;&#x534F;&#x8BAE;&#x672C;&#x8EAB;&#x662F;&#x5DF2;&#x7ECF;&#x56FA;&#x5B9A;&#x597D;&#x7684;&#xFF0C;&#x5341;&#x5206;&#x9002;&#x5408;&#x4F7F;&#x7528;Protocol Buffer&#x4F5C;&#x4E3A;&#x534F;&#x8BAE;&#x547D;&#x4EE4;&#x4F20;&#x8F93;&#x3002;</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Protocol-Buffer/" rel="tag"># Protocol Buffer</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/12/28/2pc/" rel="next" title="分布式事务2PC协议">
+                <i class="fa fa-chevron-left"></i> 分布式事务2PC协议
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Bian Shuai" />
+          <p class="site-author-name" itemprop="name">Bian Shuai</p>
+          <p class="site-description motion-element" itemprop="description">bianshuai513@163.com</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#编写proto文件"><span class="nav-number">1.</span> <span class="nav-text">编写proto文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译proto文件"><span class="nav-number">2.</span> <span class="nav-text">编译proto文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用proto文件"><span class="nav-number">3.</span> <span class="nav-text">使用proto文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#proto文件简单语法分析"><span class="nav-number">4.</span> <span class="nav-text">proto文件简单语法分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bian Shuai</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>

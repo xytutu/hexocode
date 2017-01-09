@@ -1,0 +1,646 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Net," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Take Mind" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="&amp;#x56DB;&amp;#x5C42;&amp;#x8D1F;&amp;#x8F7D;&amp;#x5747;&amp;#x8861;&amp;#x56DB;&amp;#x5C42;&amp;#x8D1F;&amp;#x8F7D;&amp;#x5747;&amp;#x8861;&amp;#x6307;&amp;#x7684;&amp;#x662F;&amp;#x5728;&amp;#x5373;&amp;#x5728;OSI&amp;#x7B2C;4&amp;#x5C42;&amp;#x5DE5;&amp;#x4F5C;&amp;#xFF0C;&amp;#x5C31;&amp;#x">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LVS四层负载均衡">
+<meta property="og:url" content="https://xytutu.github.io/2016/12/28/LVS四层负载均衡/index.html">
+<meta property="og:site_name" content="Take Mind">
+<meta property="og:description" content="&amp;#x56DB;&amp;#x5C42;&amp;#x8D1F;&amp;#x8F7D;&amp;#x5747;&amp;#x8861;&amp;#x56DB;&amp;#x5C42;&amp;#x8D1F;&amp;#x8F7D;&amp;#x5747;&amp;#x8861;&amp;#x6307;&amp;#x7684;&amp;#x662F;&amp;#x5728;&amp;#x5373;&amp;#x5728;OSI&amp;#x7B2C;4&amp;#x5C42;&amp;#x5DE5;&amp;#x4F5C;&amp;#xFF0C;&amp;#x5C31;&amp;#x">
+<meta property="og:updated_time" content="2016-12-28T12:07:36.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LVS四层负载均衡">
+<meta name="twitter:description" content="&amp;#x56DB;&amp;#x5C42;&amp;#x8D1F;&amp;#x8F7D;&amp;#x5747;&amp;#x8861;&amp;#x56DB;&amp;#x5C42;&amp;#x8D1F;&amp;#x8F7D;&amp;#x5747;&amp;#x8861;&amp;#x6307;&amp;#x7684;&amp;#x662F;&amp;#x5728;&amp;#x5373;&amp;#x5728;OSI&amp;#x7B2C;4&amp;#x5C42;&amp;#x5DE5;&amp;#x4F5C;&amp;#xFF0C;&amp;#x5C31;&amp;#x">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xytutu.github.io/2016/12/28/LVS四层负载均衡/"/>
+
+
+
+
+
+  <title> LVS四层负载均衡 | Take Mind </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Take Mind</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">生命不止，折腾不息</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xytutu.github.io/2016/12/28/LVS四层负载均衡/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Bian Shuai">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Take Mind">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Take Mind" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                LVS四层负载均衡
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-28T17:47:26+08:00">
+                2016-12-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<h2 id="&#x56DB;&#x5C42;&#x8D1F;&#x8F7D;&#x5747;&#x8861;"><a href="#&#x56DB;&#x5C42;&#x8D1F;&#x8F7D;&#x5747;&#x8861;" class="headerlink" title="&#x56DB;&#x5C42;&#x8D1F;&#x8F7D;&#x5747;&#x8861;"></a>&#x56DB;&#x5C42;&#x8D1F;&#x8F7D;&#x5747;&#x8861;</h2><p>&#x56DB;&#x5C42;&#x8D1F;&#x8F7D;&#x5747;&#x8861;&#x6307;&#x7684;&#x662F;&#x5728;&#x5373;&#x5728;OSI&#x7B2C;4&#x5C42;&#x5DE5;&#x4F5C;&#xFF0C;&#x5C31;&#x662F;TCP&#x5C42;&#xFF0C;&#x4E00;&#x822C;&#x4F7F;&#x7528;&#x7684;LVS&#x7684;IP&#x8D1F;&#x8F7D;&#x5747;&#x8861;&#xFF1B;&#x6BCF;&#x4E2A;LVS&#x4E2D;&#x7684;&#x8D1F;&#x8F7D;&#x5747;&#x8861;&#x670D;&#x52A1;&#x5668;&#x90FD;&#x6709;&#x4E00;&#x4E2A;IP&#x4E00;&#x822C;&#x79F0;&#x4E3A;VIP&#xFF0C;&#x800C;&#x7528;&#x6237;&#x5BF9;&#x670D;&#x52A1;&#x8BF7;&#x6C42;&#x5FC5;&#x987B;&#x57FA;&#x4E8E;&#x5BF9;&#x6B64;VIP&#x8FDB;&#x884C;&#x8BBF;&#x95EE;&#x3002;</p>
+<h4 id="&#x5F53;&#x7528;&#x6237;&#x7684;&#x8BF7;&#x6C42;&#x5230;&#x8FBE;VIP&#x5982;&#x4F55;&#x5206;&#x914D;&#x5230;RealServer&#x4E0A;&#x7684;&#xFF0C;&#x6B64;&#x5904;&#x6709;3&#x79CD;&#x5B9E;&#x73B0;&#x5206;&#x522B;&#x662F;NAT&#x3001;TUN&#x548C;DR&#x3002;"><a href="#&#x5F53;&#x7528;&#x6237;&#x7684;&#x8BF7;&#x6C42;&#x5230;&#x8FBE;VIP&#x5982;&#x4F55;&#x5206;&#x914D;&#x5230;RealServer&#x4E0A;&#x7684;&#xFF0C;&#x6B64;&#x5904;&#x6709;3&#x79CD;&#x5B9E;&#x73B0;&#x5206;&#x522B;&#x662F;NAT&#x3001;TUN&#x548C;DR&#x3002;" class="headerlink" title="&#x5F53;&#x7528;&#x6237;&#x7684;&#x8BF7;&#x6C42;&#x5230;&#x8FBE;VIP&#x5982;&#x4F55;&#x5206;&#x914D;&#x5230;RealServer&#x4E0A;&#x7684;&#xFF0C;&#x6B64;&#x5904;&#x6709;3&#x79CD;&#x5B9E;&#x73B0;&#x5206;&#x522B;&#x662F;NAT&#x3001;TUN&#x548C;DR&#x3002;"></a>&#x5F53;&#x7528;&#x6237;&#x7684;&#x8BF7;&#x6C42;&#x5230;&#x8FBE;VIP&#x5982;&#x4F55;&#x5206;&#x914D;&#x5230;RealServer&#x4E0A;&#x7684;&#xFF0C;&#x6B64;&#x5904;&#x6709;3&#x79CD;&#x5B9E;&#x73B0;&#x5206;&#x522B;&#x662F;NAT&#x3001;TUN&#x548C;DR&#x3002;</h4><h3 id="NAT&#xFF1A;-&#x5373;&#xFF08;Virtual-Server-via-Network-Address-Translation&#xFF09;"><a href="#NAT&#xFF1A;-&#x5373;&#xFF08;Virtual-Server-via-Network-Address-Translation&#xFF09;" class="headerlink" title="NAT&#xFF1A; &#x5373;&#xFF08;Virtual Server via Network Address Translation&#xFF09;"></a>NAT&#xFF1A; &#x5373;&#xFF08;Virtual Server via Network Address Translation&#xFF09;</h3><p>&#x7F51;&#x7EDC;&#x7FFB;&#x8BD1;&#x6280;&#x672F;&#x5B9E;&#x73B0;&#x865A;&#x62DF;&#x670D;&#x52A1;&#x5668;&#xFF0C;&#x5F53;&#x7528;&#x6237;&#x7684;&#x8BF7;&#x6C42;&#x5230;&#x8FBE;VIP Server&#x7684;&#x65F6;&#x5019;&#xFF0C;VIP Server&#x6839;&#x636E;&#x4E00;&#x5B9A;&#x7684;&#x8D1F;&#x8F7D;&#x5747;&#x8861;&#x7B56;&#x7565;&#xFF0C;&#x4FEE;&#x6539;&#x62A5;&#x6587;&#x7684;&#x76EE;&#x7684;IP&#x548C;&#x7AEF;&#x53E3;&#x4E3A;Real Server&#xFF0C;&#x800C;Real Server&#x505A;&#x51FA;&#x76F8;&#x5E94;&#x4E4B;&#x540E;&#xFF0C;&#x5C06;&#x62A5;&#x6587;&#x8FD4;&#x56DE;VIP Server&#xFF0C;VIP &#x4FEE;&#x6539;&#x62A5;&#x6587;&#x7684;&#x6E90;&#x5730;&#x5740;&#x4ECE;Real Server&#x6539;&#x4E3A;VIP Server &#x53D1;&#x7ED9;Client&#x3002;&#x4ECE;&#x4E0A;&#x9762;&#x8FC7;&#x7A0B;&#x4E2D;&#x6D41;&#x91CF;&#x7684;&#x8FDB;&#x5165;&#x548C;&#x65B9;&#x4F4D;&#x5168;&#x90E8;&#x9700;&#x8981;&#x7ECF;&#x8FC7;VIP Server&#x91CD;&#x5199;&#xFF0C;&#x6240;&#x4EE5;&#x5B58;&#x5728;VIP Server&#x7684;&#x74F6;&#x9888;&#x3002;</p>
+<h3 id="TUN-&#xFF1A;&#x5373;&#xFF08;Virtual-Server-via-IP-Tunneling&#xFF09;"><a href="#TUN-&#xFF1A;&#x5373;&#xFF08;Virtual-Server-via-IP-Tunneling&#xFF09;" class="headerlink" title="TUN &#xFF1A;&#x5373;&#xFF08;Virtual Server via IP Tunneling&#xFF09;"></a>TUN &#xFF1A;&#x5373;&#xFF08;Virtual Server via IP Tunneling&#xFF09;</h3><p>IP&#x96A7;&#x9053;&#x6280;&#x672F;&#x5B9E;&#x73B0;&#x865A;&#x62DF;&#x670D;&#x52A1;&#x5668;&#xFF0C; &#x548C;NAT&#x6280;&#x672F;&#x76F8;&#x4F3C;&#x6D41;&#x91CF;&#x8FDB;&#x5165;&#x5E76;&#x8F6C;&#x53D1;&#x7ED9;Real Server&#x94FE;&#x8DEF;&#x662F;&#x76F8;&#x540C;&#x7684;&#xFF0C;&#x4E0D;&#x540C;&#x7684;&#x662F;Real Server&#x8FD4;&#x56DE;&#x76F4;&#x63A5;&#x8303;&#x56F4;Client&#x4E0D;&#x7ECF;&#x8FC7;&#x524D;&#x7AEF;VIP Server&#xFF0C;&#x6B64;&#x65B9;&#x5F0F;VIP Server&#x5C06;&#x53EA;&#x5904;&#x7406;&#x8FDB;&#x5165;&#x7684;&#x6D41;&#x91CF;&#xFF0C;&#x96C6;&#x7FA4;&#x7CFB;&#x7EDF;&#x7684;&#x541E;&#x5410;&#x91CF;&#x5927;&#x5927;&#x63D0;&#x9AD8;&#x3002;</p>
+<h3 id="DR&#xFF1A;-&#x5373;&#xFF08;Virtual-Server-via-Direct-Routing&#xFF09;"><a href="#DR&#xFF1A;-&#x5373;&#xFF08;Virtual-Server-via-Direct-Routing&#xFF09;" class="headerlink" title="DR&#xFF1A; &#x5373;&#xFF08;Virtual Server via Direct Routing&#xFF09;"></a>DR&#xFF1A; &#x5373;&#xFF08;Virtual Server via Direct Routing&#xFF09;</h3><p>&#x76F4;&#x63A5;&#x8DEF;&#x7531;&#x5B9E;&#x73B0;&#x865A;&#x62DF;&#x670D;&#x52A1;&#x5668;&#xFF0C;&#x5B83;&#x7684;&#x601D;&#x8DEF;&#x548C;TUN&#x6280;&#x672F;&#x6BD4;&#x8F83;&#x76F8;&#x4F3C;&#xFF0C;&#x5F53;&#x65F6;&#x5728;&#x7528;&#x6237;&#x8FDB;&#x5165;&#x7684;&#x6D41;&#x91CF;&#x8F6C;&#x53D1;&#x5230;Real Server&#x7684;&#x65F6;&#x5019;&#x4E0D;&#x662F;&#x91C7;&#x7528;IP&#x8FDB;&#x884C;&#x8F6C;&#x53D1;&#x7684;&#xFF0C;&#x800C;&#x662F;&#x6839;&#x636E;mac&#x5730;&#x5740;&#xFF0C;&#x76F4;&#x63A5;&#x4FEE;&#x6539;&#x6570;&#x636E;&#x5305;&#x7684;mac&#x7684;&#x5730;&#x5740;&#xFF0C;&#x76F8;&#x5E94;&#x62A5;&#x6587;&#x4E5F;&#x662F;&#x76F4;&#x63A5;&#x8FD4;&#x56DE;&#x7ED9;Client&#x3002;(DR&#x6A21;&#x5F0F;&#x4E0B;&#x9700;&#x8981;LVS&#x548C;&#x7ED1;&#x5B9A;&#x540C;&#x4E00;&#x4E2A;VIP,&#x901A;&#x8FC7;loopback&#x5B9E;&#x73B0;)&#x8FD9;&#x79CD;&#x65B9;&#x5F0F;&#x662F;3&#x79CD;&#x65B9;&#x5F0F;&#x4E2D;&#x6548;&#x7387;&#x6700;&#x9AD8;&#x7684;&#xFF0C;&#x4F46;&#x662F;&#x5B83;&#x662F;&#x57FA;&#x4E8E;mac&#x8F6C;&#x53D1;&#x7684;&#xFF0C;&#x9650;&#x5236;VIP Server&#x4E0E;Real Server&#x90FD;&#x6709;&#x4E00;&#x5757;&#x7F51;&#x5361;&#x8FDE;&#x5728;&#x540C;&#x4E00;&#x7269;&#x7406;&#x7F51;&#x6BB5;&#x4E0A;&#x3002;</p>
+<h3 id="&#x603B;&#x62EC;"><a href="#&#x603B;&#x62EC;" class="headerlink" title="&#x603B;&#x62EC;"></a>&#x603B;&#x62EC;</h3><p>&#x8D1F;&#x8F7D;&#x5747;&#x8861;&#x7CFB;&#x7EDF;&#x5FC5;&#x987B;&#x5EFA;&#x7ACB;&#x5728;&#x9762;&#x5BF9;&#x7F51;&#x7EDC;&#x8FDE;&#x63A5;&#x7684;&#x57FA;&#x7840;&#x4E0A;&#xFF0C;&#x800C;&#x4E0D;&#x662F;&#x9762;&#x5BF9;&#x6570;&#x636E;&#x5305;&#x7684;&#x57FA;&#x7840;&#x4E0A;&#x3002;&#x4E5F;&#x5C31;&#x662F;&#x8BF4;&#x7F51;&#x7EDC;&#x8FDE;&#x63A5;&#x662F;&#x6709;&#x72B6;&#x6001;&#xFF0C;A&#x6570;&#x636E;&#x5305;&#x548C;&#x540E;&#x7EED;B&#x6570;&#x636E;&#x62A5;&#x5F88;&#x53EF;&#x80FD;&#x662F;&#x6709;&#x5173;&#x8054;&#xFF0C;&#x6BD4;&#x5982;TCP&#x7684;&#x4E09;&#x6B21;&#x63E1;&#x624B;&#xFF0C;&#x8F6F;&#x8D1F;&#x8F7D;&#x9762;&#x5411;&#x7684;&#x5BF9;&#x8C61;&#x5E94;&#x8BE5;&#x662F;&#x4E00;&#x4E2A;&#x5DF2;&#x7ECF;&#x5EFA;&#x7ACB;&#x8FDE;&#x63A5;&#x7684;&#x7528;&#x6237;&#xFF0C;&#x800C;&#x4E0D;&#x662F;&#x4E00;&#x4E2A;&#x5B64;&#x96F6;&#x96F6;&#x7684;IP&#x5305;&#x3002;&#x6240;&#x4EE5;&#x8BF4;&#x5728;&#x7B2C;&#x4E00;&#x6B21;&#x5BF9;&#x67D0;Client&#x7684;&#x6D41;&#x91CF;&#x9009;&#x5B9A;&#x4E86;&#x540E;&#x7AEF;&#x670D;&#x52A1;&#x5668;&#x4E4B;&#x540E;&#xFF0C;&#x4E00;&#x5B9A;&#x8BB0;&#x5F55;&#x51FA;&#x5148;&#x8F6C;&#x53D1;&#x7684;&#x8DEF;&#x7531;&#x8868;&#xFF0C;&#x5728;&#x4E00;&#x5B9A;&#x65F6;&#x95F4;&#x7684;&#x8303;&#x56F4;&#x5185;&#x4FDD;&#x8BC1;&#x4FDD;&#x6301;Client&#x548C;&#x540E;&#x7AEF;&#x670D;&#x52A1;&#x5668;&#x8FDE;&#x63A5;&#x5173;&#x8054;&#x6027;&#x3002;&#x4E3A;&#x4E86;&#x786E;&#x4FDD;&#x8FD9;&#x4E00;&#x70B9;&#xFF0C;LVS&#x5185;&#x90E8;&#x7EF4;&#x62A4;&#x7740;&#x4E00;&#x4E2A;Session&#x7684;Hash&#x8868;&#xFF0C;&#x901A;&#x8FC7;&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#x67D0;&#x4E9B;&#x4FE1;&#x606F;&#x53EF;&#x4EE5;&#x627E;&#x5230;&#x5E94;&#x8BE5;&#x8F6C;&#x53D1;&#x5230;&#x54EA;&#x4E00;&#x53F0;Real Server&#x4E0A;&#x3002;</p>
+</blockquote>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Net/" rel="tag"># Net</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2016/12/28/overrideclassloader/" rel="prev" title="Java自定义Class加载顺序">
+                Java自定义Class加载顺序 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Bian Shuai" />
+          <p class="site-author-name" itemprop="name">Bian Shuai</p>
+          <p class="site-description motion-element" itemprop="description">bianshuai513@163.com</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#四层负载均衡"><span class="nav-number">1.</span> <span class="nav-text">四层负载均衡</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#当用户的请求到达VIP如何分配到RealServer上的，此处有3种实现分别是NAT、TUN和DR。"><span class="nav-number">1.0.1.</span> <span class="nav-text">当用户的请求到达VIP如何分配到RealServer上的，此处有3种实现分别是NAT、TUN和DR。</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT：-即（Virtual-Server-via-Network-Address-Translation）"><span class="nav-number">1.1.</span> <span class="nav-text">NAT： 即（Virtual Server via Network Address Translation）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#TUN-：即（Virtual-Server-via-IP-Tunneling）"><span class="nav-number">1.2.</span> <span class="nav-text">TUN ：即（Virtual Server via IP Tunneling）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DR：-即（Virtual-Server-via-Direct-Routing）"><span class="nav-number">1.3.</span> <span class="nav-text">DR： 即（Virtual Server via Direct Routing）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总括"><span class="nav-number">1.4.</span> <span class="nav-text">总括</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bian Shuai</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
