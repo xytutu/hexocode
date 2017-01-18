@@ -1,0 +1,652 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="classloader," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="Take Mind" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="&amp;#x80CC;&amp;#x666F;&amp;#x2003;&amp;#x2003;&amp;#x6700;&amp;#x8FD1;&amp;#x4F7F;&amp;#x7528;&amp;#x6B3E;&amp;#x4E2D;&amp;#x95F4;&amp;#x4EF6;&amp;#x7684;&amp;#x5BB9;&amp;#x5668;&amp;#xFF0C;&amp;#x5B83;&amp;#x4F1A;&amp;#x81EA;&amp;#x52A8;&amp;#x52A0;&amp;#x8F7D;&amp;#x6240;&amp;#x6709;&amp;#x7684;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java 线程上下文类加载器(ContextClassLoader)">
+<meta property="og:url" content="https://xytutu.github.io/2017/01/18/contextclassloader/index.html">
+<meta property="og:site_name" content="Take Mind">
+<meta property="og:description" content="&amp;#x80CC;&amp;#x666F;&amp;#x2003;&amp;#x2003;&amp;#x6700;&amp;#x8FD1;&amp;#x4F7F;&amp;#x7528;&amp;#x6B3E;&amp;#x4E2D;&amp;#x95F4;&amp;#x4EF6;&amp;#x7684;&amp;#x5BB9;&amp;#x5668;&amp;#xFF0C;&amp;#x5B83;&amp;#x4F1A;&amp;#x81EA;&amp;#x52A8;&amp;#x52A0;&amp;#x8F7D;&amp;#x6240;&amp;#x6709;&amp;#x7684;">
+<meta property="og:updated_time" content="2017-01-18T03:54:56.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java 线程上下文类加载器(ContextClassLoader)">
+<meta name="twitter:description" content="&amp;#x80CC;&amp;#x666F;&amp;#x2003;&amp;#x2003;&amp;#x6700;&amp;#x8FD1;&amp;#x4F7F;&amp;#x7528;&amp;#x6B3E;&amp;#x4E2D;&amp;#x95F4;&amp;#x4EF6;&amp;#x7684;&amp;#x5BB9;&amp;#x5668;&amp;#xFF0C;&amp;#x5B83;&amp;#x4F1A;&amp;#x81EA;&amp;#x52A8;&amp;#x52A0;&amp;#x8F7D;&amp;#x6240;&amp;#x6709;&amp;#x7684;">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://xytutu.github.io/2017/01/18/contextclassloader/"/>
+
+
+
+
+
+  <title> Java 线程上下文类加载器(ContextClassLoader) | Take Mind </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Take Mind</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+    
+      <p class="site-subtitle">生命不止，折腾不息</p>
+    
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="https://xytutu.github.io/2017/01/18/contextclassloader/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="Bian Shuai">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/images/avatar.png">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Take Mind">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Take Mind" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Java 线程上下文类加载器(ContextClassLoader)
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-01-18T11:24:04+08:00">
+                2017-01-18
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="&#x80CC;&#x666F;"><a href="#&#x80CC;&#x666F;" class="headerlink" title="&#x80CC;&#x666F;"></a>&#x80CC;&#x666F;</h3><p>&#x2003;&#x2003;&#x6700;&#x8FD1;&#x4F7F;&#x7528;&#x6B3E;&#x4E2D;&#x95F4;&#x4EF6;&#x7684;&#x5BB9;&#x5668;&#xFF0C;&#x5B83;&#x4F1A;&#x81EA;&#x52A8;&#x52A0;&#x8F7D;&#x6240;&#x6709;&#x7684;&#x4E2D;&#x95F4;&#x4EF6;&#xFF0C;&#x5E76;&#x4F7F;&#x7528;&#x4E0D;&#x540C;&#x7684;classLoader&#x5C06;&#x5404;&#x4E2A;&#x4E2D;&#x95F4;&#x4EF6;&#x9694;&#x79BB;&#x52A0;&#x8F7D;&#xFF0C;&#x63D0;&#x4F9B;&#x7ED9;&#x5E94;&#x7528;&#x63D0;&#x4F9B;&#x670D;&#x52A1;&#x3002;</p>
+<p>&#x2003;&#x2003;&#x4F46;&#x662F;&#x8FD9;&#x91CC;&#x5C31;&#x51FA;&#x73B0;&#x4E00;&#x4E2A;&#x95EE;&#x9898;&#xFF0C;HBase&#x521D;&#x59CB;&#x5316;&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#x662F;&#x5728;&#x5E94;&#x7528;ClassLoader&#x4E2D;&#x8C03;&#x7528;&#x7684;&#xFF0C;&#x5728;Hbase&#x5BA2;&#x6237;&#x7AEF;&#x7684;&#x521D;&#x59CB;&#x5316;&#x7684;&#x65F6;&#x5019;&#x4F1A;&#x52A0;&#x8F7D;&#x9ED8;&#x8BA4;&#x7684;&#x914D;&#x7F6E;&#x6587;&#x4EF6;&#xFF0C;&#x6B64;&#x5904;&#x5C31;&#x52A0;&#x8F7D;&#x5931;&#x8D25;&#x4E86;&#xFF1B;&#x539F;&#x56E0;&#x662F;&#x52A0;&#x8F7D;&#x8D44;&#x6E90;&#x914D;&#x7F6E;&#x7684;&#x662F;&#x5BB9;&#x5668;&#x7684;modelClassLoader&#x800C;&#x5728;&#x5BA2;&#x6237;&#x7AEF;&#x8C03;&#x7528;&#x7684;&#x65F6;&#x5019;&#x5374;&#x5728;thread&#x7684;ContextClassLoader&#x4E2D;&#x5BFB;&#x627E;&#xFF0C;&#x5BFC;&#x81F4;&#x65E0;&#x6CD5;&#x52A0;&#x8F7D;&#x5230;&#x3002;</p>
+<p>&#x2003;&#x2003;&#x6709;2&#x79CD;&#x65B9;&#x5F0F;&#x89E3;&#x51B3;&#xFF1A;</p>
+<ul>
+<li>&#x5C06;&#x9700;&#x8981;&#x7684;&#x8D44;&#x6E90;&#x6587;&#x4EF6;&#x914D;&#x7F6E;&#x5230;&#x5E94;&#x7528;&#x7684;&#x8DEF;&#x5F84;&#x4E0B;&#xFF0C;&#x800C;&#x4E0D;&#x662F;&#x7528;HBase jar&#x5305;&#x4E2D;&#x9ED8;&#x8BA4;&#x7684;&#x914D;&#x7F6E;&#xFF0C;<br>&#x8FD9;&#x6837;&#x5C31;&#x80FD;&#x5728;&#x5E94;&#x7528;&#x7684;ClassLoader&#x4E2D;&#x5BFB;&#x627E;&#x5230;&#x3002;</li>
+<li>&#x5728;&#x52A0;&#x8F7D;&#x8D44;&#x6E90;&#x7684;&#x4E0A;&#x4E0B;&#x6587;&#x4E2D;&#xFF0C;&#x8BBE;&#x7F6E;Thread&#x7684;ContextClassLoader&#x4E3A;class.getClassLoader()&#xFF0C;<br>&#x8FD9;&#x6837;&#x5C31;&#x80FD;&#x591F;HBase&#x5728;&#x8C03;&#x7528;Thread.getContextClassLoader()&#x7684;&#x65F6;&#x5019;&#xFF0C;&#x5C31;&#x662F;&#x52A0;&#x8F7D;&#x6B64;&#x7C7B;&#x7684;modelClassLoader&#x4E86;,&#x4EE3;&#x7801;&#x5982;&#x4E0B;&#xFF1A;</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">Thread currentThread = Thread.currentThread();</div><div class="line">ClassLoader oldCl = currentThread.getContextClassLoader();</div><div class="line">try {</div><div class="line">currentThread.setContextClassLoader(getClass().getClassLoader());</div><div class="line">// Load Resource</div><div class="line">} finally {</div><div class="line">currentThread.setContextClassLoader(oldCl);</div><div class="line">}</div></pre></td></tr></table></figure>
+<h3 id="&#x7EBF;&#x7A0B;&#x4E0A;&#x4E0B;&#x6587;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;-ContextClassLoader"><a href="#&#x7EBF;&#x7A0B;&#x4E0A;&#x4E0B;&#x6587;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;-ContextClassLoader" class="headerlink" title="&#x7EBF;&#x7A0B;&#x4E0A;&#x4E0B;&#x6587;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;(ContextClassLoader)"></a>&#x7EBF;&#x7A0B;&#x4E0A;&#x4E0B;&#x6587;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;(ContextClassLoader)</h3><p>&#x2003;&#x2003;&#x7C7B; java.lang.Thread&#x4E2D;&#x7684;&#x65B9;&#x6CD5; getContextClassLoader()&#x548C; setContextClassLoader(ClassLoader classLoader)&#x7528;&#x6765;&#x83B7;&#x53D6;&#x548C;&#x8BBE;&#x7F6E;&#x7EBF;&#x7A0B;&#x7684;&#x4E0A;&#x4E0B;&#x6587;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x3002;&#x5982;&#x679C;&#x6CA1;&#x6709;&#x901A;&#x8FC7; setContextClassLoader(ClassLoader classLoader)&#x65B9;&#x6CD5;&#x8FDB;&#x884C;&#x8BBE;&#x7F6E;&#x7684;&#x8BDD;&#xFF0C;&#x7EBF;&#x7A0B;&#x5C06;&#x7EE7;&#x627F;&#x5176;&#x7236;&#x7EBF;&#x7A0B;&#x7684;&#x4E0A;&#x4E0B;&#x6587;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x3002;Java &#x5E94;&#x7528;&#x8FD0;&#x884C;&#x7684;&#x521D;&#x59CB;&#x7EBF;&#x7A0B;&#x7684;&#x4E0A;&#x4E0B;&#x6587;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x662F;&#x7CFB;&#x7EDF;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x3002;&#x5728;&#x7EBF;&#x7A0B;&#x4E2D;&#x8FD0;&#x884C;&#x7684;&#x4EE3;&#x7801;&#x53EF;&#x4EE5;&#x901A;&#x8FC7;&#x6B64;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x6765;&#x52A0;&#x8F7D;&#x7C7B;&#x548C;&#x8D44;&#x6E90;&#x3002;<br>&#x6700;&#x65E9;&#x7EBF;&#x7A0B;&#x4E0A;&#x4E0B;&#x6587;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x6700;&#x4E3B;&#x8981;&#x7684;&#x610F;&#x4E49;&#x662F;&#x7528;&#x5728;SPI&#x4E0A;&#x7684;&#xFF0C;&#x89E3;&#x51B3;&#x53CC;&#x4EB2;&#x59D4;&#x6D3E;&#x65E0;&#x6CD5;&#x89E3;&#x51B3;&#x7684;&#x7C7B;&#x52A0;&#x8F7D;&#x95EE;&#x9898;&#x3002;</p>
+<p>&#x2003;&#x2003;SPI&#x7C7B;&#x52A0;&#x8F7D;&#x9047;&#x5230;&#x6700;&#x4E3B;&#x8981;&#x7684;&#x95EE;&#x9898;&#x662F;&#xFF0C;SPI &#x7684;&#x63A5;&#x53E3;&#x662F; Java &#x6838;&#x5FC3;&#x5E93;&#x7684;&#x4E00;&#x90E8;&#x5206;&#xFF0C;&#x662F;&#x7531;&#x5F15;&#x5BFC;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x6765;&#x52A0;&#x8F7D;&#x7684;&#xFF1B;SPI &#x5B9E;&#x73B0;&#x7684; Java &#x7C7B;&#x4E00;&#x822C;&#x662F;&#x7531;&#x7CFB;&#x7EDF;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x6765;&#x52A0;&#x8F7D;&#x7684;&#x3002;&#x5F15;&#x5BFC;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x662F;&#x65E0;&#x6CD5;&#x627E;&#x5230; SPI &#x7684;&#x5B9E;&#x73B0;&#x7C7B;&#x7684;&#xFF0C;&#x56E0;&#x4E3A;&#x5B83;&#x53EA;&#x52A0;&#x8F7D; Java &#x7684;&#x6838;&#x5FC3;&#x5E93;&#x3002;&#x6240;&#x4EE5;&#x6B64;&#x65F6;&#x5E94;&#x8BE5;&#x7531;&#x8C01;&#x53BB;&#x52A0;&#x8F7D;SPI&#x7684;&#x5177;&#x4F53;&#x5B9E;&#x73B0;&#x5C31;&#x4E0D;&#x6E05;&#x695A;&#x4E86;&#xFF0C;&#x56E0;&#x4E3A;&#x5F15;&#x5BFC;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;&#x5DF2;&#x7ECF;&#x662F;&#x9876;&#x5C42;&#x7C7B;&#x4E86;&#xFF0C;&#x53CC;&#x4EB2;&#x59D4;&#x6D3E;&#x80AF;&#x5B9A;&#x662F;&#x4E0D;&#x884C;&#x7684;&#x3002;<br>&#x8FD9;&#x4E2A;&#x662F;&#x7528;&#x4E0A;&#x4E0B;&#x6587;&#x52A0;&#x8F7D;&#x5668;&#x6B63;&#x597D;&#x80FD;&#x89E3;&#x51B3;&#x8FD9;&#x4E2A;&#x95EE;&#x9898;&#xFF0C;ServiceLoader&#x53EA;&#x9700;&#x8981;&#x4F7F;&#x7528;&#x7528;&#x7EBF;&#x7A0B;&#x4E0A;&#x4E0B;&#x6587;&#x52A0;&#x8F7D;&#x5668;&#x53BB;&#x52A0;&#x8F7D;&#x8FD9;&#x4E2A;&#x7C7B;&#x5C31;&#x884C;&#x4E0D;&#x7528;&#x5173;&#x5FC3;&#xFF0C;&#x5177;&#x4F53;&#x662F;&#x54EA;&#x4E2A;&#x52A0;&#x8F7D;&#x5668;&#xFF0C;&#x7531;&#x8D1F;&#x8D23;&#x8C03;&#x7528;&#x7684;&#x7EBF;&#x7A0B;&#x53BB;&#x8BBE;&#x7F6E;&#x5DF2;&#x7ECF;&#x52A0;&#x8F7D;&#x5177;&#x4F53;&#x5B9E;&#x73B0;&#x7C7B;&#x7684;ClassLoader&#x5230;&#x7EBF;&#x7A0B;&#x4E0A;&#x4E0B;&#x6587;&#x5C31;&#x884C;&#x3002;</p>
+<p>&#x2003;&#x2003;&#x6211;&#x4EEC;&#x5177;&#x4F53;&#x770B;&#x4E00;&#x4E0B;ServiceLoader&#x7684;&#x4EE3;&#x7801;&#xFF0C;&#x4E5F;&#x786E;&#x5B9E;&#x662F;&#x8FD9;&#x4E48;&#x5B9E;&#x73B0;&#x7684;:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">public static &lt;S&gt; ServiceLoader&lt;S&gt; load(Class&lt;S&gt; service) {</div><div class="line">       ClassLoader cl = Thread.currentThread().getContextClassLoader();</div><div class="line">       return ServiceLoader.load(service, cl);</div><div class="line">   }</div></pre></td></tr></table></figure>
+<h3 id="&#x603B;&#x7ED3;"><a href="#&#x603B;&#x7ED3;" class="headerlink" title="&#x603B;&#x7ED3;"></a>&#x603B;&#x7ED3;</h3><p>  &#x2003;&#x2003;&#x73B0;&#x5728;&#x5404;&#x79CD;&#x5404;&#x6837;&#x7684;&#x9700;&#x6C42;&#x5B58;&#x5728;&#xFF0C;&#x5BF9;&#x81EA;&#x5B9A;&#x4E49;&#x52A0;&#x8F7D;&#x987A;&#x5E8F;&#x7684;&#x8BC9;&#x6C42;&#x4E5F;&#x8D8A;&#x6765;&#x8D8A;&#x591A;&#xFF0C;&#x524D;&#x9762;&#x7684;<a href="https://xytutu.github.io/2016/12/28/overrideclassloader/">&#x6587;&#x7AE0;</a>&#x63D0;&#x5230;&#x4E86;&#x51E0;&#x79CD;&#x601D;&#x8DEF;&#xFF0C;&#x7EBF;&#x7A0B;&#x4E0A;&#x4E0B;&#x6587;&#x7C7B;&#x52A0;&#x8F7D;&#x5668;(ContextClassLoader)&#x4E5F;&#x662F;&#x4E00;&#x79CD;&#x8F83;&#x597D;&#x7684;&#x601D;&#x8DEF;&#x3002;<br>  &#x2003;&#x2003; <em>&#x5728;SPI&#x4E2D;ContextClassLoader&#x6700;&#x672C;&#x8D28;&#x7684;&#x7279;&#x5F81;&#xFF0C;&#x5728;&#x62BD;&#x8C61;&#x7684;&#x5C42;&#x6B21;&#x53EF;&#x4EE5;&#x6307;&#x5B9A;&#x4EFB;&#x610F;&#x7684;ClassLoader&#x7684;&#x53BB;&#x52A0;&#x8F7D;&#x7C7B;&#x6216;&#x8005;&#x8D44;&#x6E90;&#xFF0C;&#x8FD9;&#x4E5F;&#x662F;&#x5728;ClassLoader&#x5B9E;&#x73B0;&#x62BD;&#x8C61;&#x7684;&#x4E00;&#x79CD;&#x65B9;&#x5F0F;</em></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/classloader/" rel="tag"># classloader</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/01/10/autoconfig-demo/" rel="next" title="Maven AutoConfig使用">
+                <i class="fa fa-chevron-left"></i> Maven AutoConfig使用
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.png"
+               alt="Bian Shuai" />
+          <p class="site-author-name" itemprop="name">Bian Shuai</p>
+          <p class="site-description motion-element" itemprop="description">bianshuai513@163.com</p>
+        </div>
+        <nav class="site-state motion-element">
+        
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">6</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#线程上下文类加载器-ContextClassLoader"><span class="nav-number">2.</span> <span class="nav-text">线程上下文类加载器(ContextClassLoader)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Bian Shuai</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Pisces
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
